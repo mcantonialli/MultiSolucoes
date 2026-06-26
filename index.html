@@ -1338,6 +1338,9 @@
                         <button class="tab" onclick="showTab('tObra', this)">
                             🏗️ Por Obra
                         </button>
+                        <button class="tab" onclick="showTab('tColab', this)">
+                            👷 Por Colaborador
+                        </button>
                         <button class="tab" onclick="showTab('tPend', this)">
                             ⚠️ Pendências
                         </button>
@@ -1355,9 +1358,48 @@
                                 <div class="fg">
                                     <label>Ano</label
                                     ><select
-                                        id="relAno"
+                                        id="flAno"
                                         onchange="buildFluxo()"
                                     ></select>
+                                </div>
+                                <div class="fg">
+                                    <label>Mês</label
+                                    ><select
+                                        id="flMes"
+                                        onchange="buildFluxo()"
+                                    ></select>
+                                </div>
+                                <div class="fg">
+                                    <label>Dia</label
+                                    ><select
+                                        id="flDia"
+                                        onchange="buildFluxo()"
+                                    ></select>
+                                </div>
+                                <div class="fg">
+                                    <label>De</label
+                                    ><input
+                                        type="date"
+                                        id="flDtI"
+                                        onchange="buildFluxo()"
+                                    />
+                                </div>
+                                <div class="fg">
+                                    <label>Até</label
+                                    ><input
+                                        type="date"
+                                        id="flDtF"
+                                        onchange="buildFluxo()"
+                                    />
+                                </div>
+                                <div class="fg">
+                                    <label>&nbsp;</label>
+                                    <button
+                                        class="btn btn-sec btn-sm"
+                                        onclick="limparFiltroRel('fl', buildFluxo)"
+                                    >
+                                        ✕ Limpar
+                                    </button>
                                 </div>
                             </div>
                             <canvas id="chFluxo" height="110"></canvas>
@@ -1369,14 +1411,176 @@
                             <div class="card-title">
                                 Orçamento × Custo × Receita por Obra
                             </div>
+                            <div
+                                class="fbar no-print"
+                                style="margin-bottom: 12px"
+                            >
+                                <div class="fg">
+                                    <label>Ano</label
+                                    ><select
+                                        id="obAno"
+                                        onchange="buildObraChart()"
+                                    ></select>
+                                </div>
+                                <div class="fg">
+                                    <label>Mês</label
+                                    ><select
+                                        id="obMes"
+                                        onchange="buildObraChart()"
+                                    ></select>
+                                </div>
+                                <div class="fg">
+                                    <label>Dia</label
+                                    ><select
+                                        id="obDia"
+                                        onchange="buildObraChart()"
+                                    ></select>
+                                </div>
+                                <div class="fg">
+                                    <label>De</label
+                                    ><input
+                                        type="date"
+                                        id="obDtI"
+                                        onchange="buildObraChart()"
+                                    />
+                                </div>
+                                <div class="fg">
+                                    <label>Até</label
+                                    ><input
+                                        type="date"
+                                        id="obDtF"
+                                        onchange="buildObraChart()"
+                                    />
+                                </div>
+                                <div class="fg">
+                                    <label>&nbsp;</label>
+                                    <button
+                                        class="btn btn-sec btn-sm"
+                                        onclick="limparFiltroRel('ob', buildObraChart)"
+                                    >
+                                        ✕ Limpar
+                                    </button>
+                                </div>
+                            </div>
                             <canvas id="chObra" height="110"></canvas>
                         </div>
                         <div id="obraRelTable"></div>
+                    </div>
+                    <div id="tColab" style="display: none">
+                        <div class="card">
+                            <div class="card-title">
+                                👷 Custo e Dias Trabalhados por Colaborador
+                            </div>
+                            <div
+                                class="fbar no-print"
+                                style="margin-bottom: 12px"
+                            >
+                                <div class="fg">
+                                    <label>Ano</label
+                                    ><select
+                                        id="cbAno"
+                                        onchange="buildColabChart()"
+                                    ></select>
+                                </div>
+                                <div class="fg">
+                                    <label>Mês</label
+                                    ><select
+                                        id="cbMes"
+                                        onchange="buildColabChart()"
+                                    ></select>
+                                </div>
+                                <div class="fg">
+                                    <label>Dia</label
+                                    ><select
+                                        id="cbDia"
+                                        onchange="buildColabChart()"
+                                    ></select>
+                                </div>
+                                <div class="fg">
+                                    <label>De</label
+                                    ><input
+                                        type="date"
+                                        id="cbDtI"
+                                        onchange="buildColabChart()"
+                                    />
+                                </div>
+                                <div class="fg">
+                                    <label>Até</label
+                                    ><input
+                                        type="date"
+                                        id="cbDtF"
+                                        onchange="buildColabChart()"
+                                    />
+                                </div>
+                                <div class="fg">
+                                    <label>&nbsp;</label>
+                                    <button
+                                        class="btn btn-sec btn-sm"
+                                        onclick="limparFiltroRel('cb', buildColabChart)"
+                                    >
+                                        ✕ Limpar
+                                    </button>
+                                </div>
+                            </div>
+                            <canvas id="chColab" height="110"></canvas>
+                        </div>
+                        <div id="colabRelTable"></div>
                     </div>
                     <div id="tPend" style="display: none">
                         <div class="card">
                             <div class="card-title">
                                 ⚠️ Pendentes / Não Recebidos
+                            </div>
+                            <div
+                                class="fbar no-print"
+                                style="margin-bottom: 12px"
+                            >
+                                <div class="fg">
+                                    <label>Ano</label
+                                    ><select
+                                        id="pdAno"
+                                        onchange="buildPend()"
+                                    ></select>
+                                </div>
+                                <div class="fg">
+                                    <label>Mês</label
+                                    ><select
+                                        id="pdMes"
+                                        onchange="buildPend()"
+                                    ></select>
+                                </div>
+                                <div class="fg">
+                                    <label>Dia</label
+                                    ><select
+                                        id="pdDia"
+                                        onchange="buildPend()"
+                                    ></select>
+                                </div>
+                                <div class="fg">
+                                    <label>De</label
+                                    ><input
+                                        type="date"
+                                        id="pdDtI"
+                                        onchange="buildPend()"
+                                    />
+                                </div>
+                                <div class="fg">
+                                    <label>Até</label
+                                    ><input
+                                        type="date"
+                                        id="pdDtF"
+                                        onchange="buildPend()"
+                                    />
+                                </div>
+                                <div class="fg">
+                                    <label>&nbsp;</label>
+                                    <button
+                                        class="btn btn-sec btn-sm"
+                                        onclick="limparFiltroRel('pd', buildPend)"
+                                    >
+                                        ✕ Limpar
+                                    </button>
+                                </div>
                             </div>
                             <div id="pendTable"></div>
                         </div>
@@ -1384,12 +1588,41 @@
                     <div id="tExtra" style="display: none">
                         <div class="fbar no-print">
                             <div class="fg">
+                                <label>Ano</label
+                                ><select
+                                    id="exAno"
+                                    onchange="buildExtrato()"
+                                ></select>
+                            </div>
+                            <div class="fg">
+                                <label>Mês</label
+                                ><select
+                                    id="exMes"
+                                    onchange="buildExtrato()"
+                                ></select>
+                            </div>
+                            <div class="fg">
+                                <label>Dia</label
+                                ><select
+                                    id="exDia"
+                                    onchange="buildExtrato()"
+                                ></select>
+                            </div>
+                            <div class="fg">
                                 <label>De</label
-                                ><input type="date" id="exDtI" />
+                                ><input
+                                    type="date"
+                                    id="exDtI"
+                                    onchange="buildExtrato()"
+                                />
                             </div>
                             <div class="fg">
                                 <label>Até</label
-                                ><input type="date" id="exDtF" />
+                                ><input
+                                    type="date"
+                                    id="exDtF"
+                                    onchange="buildExtrato()"
+                                />
                             </div>
                             <div class="fg">
                                 <label>Tipo</label
@@ -1413,6 +1646,12 @@
                                         onclick="buildExtrato()"
                                     >
                                         🔍 Gerar
+                                    </button>
+                                    <button
+                                        class="btn btn-sec btn-sm"
+                                        onclick="limparFiltroRel('ex', buildExtrato)"
+                                    >
+                                        ✕ Limpar
                                     </button>
                                     <button
                                         class="btn btn-sec btn-sm no-print"
@@ -2331,10 +2570,12 @@
             }
 
             function showTab(id, btn) {
-                ["tFluxo", "tObra", "tPend", "tExtra"].forEach((t) => {
-                    const el = document.getElementById(t);
-                    if (el) el.style.display = "none";
-                });
+                ["tFluxo", "tObra", "tColab", "tPend", "tExtra"].forEach(
+                    (t) => {
+                        const el = document.getElementById(t);
+                        if (el) el.style.display = "none";
+                    },
+                );
                 document
                     .querySelectorAll("#pg-rel .tab")
                     .forEach((b) => b.classList.remove("active"));
@@ -2342,7 +2583,9 @@
                 btn.classList.add("active");
                 if (id === "tFluxo") buildFluxo();
                 if (id === "tObra") buildObraChart();
+                if (id === "tColab") buildColabChart();
                 if (id === "tPend") buildPend();
+                if (id === "tExtra") buildExtrato();
             }
 
             function showCfgTab(id, btn) {
@@ -3117,26 +3360,112 @@
 
             // ── RELATÓRIOS ───────────────────────────────────────────────
             let chFluxo = null,
-                chObra = null;
-            function renderRel() {
-                const movs = db("movimentacao");
-                const anos = [
-                    ...new Set(
-                        movs
+                chObra = null,
+                chColab = null;
+            const MESES_PT = [
+                "Jan",
+                "Fev",
+                "Mar",
+                "Abr",
+                "Mai",
+                "Jun",
+                "Jul",
+                "Ago",
+                "Set",
+                "Out",
+                "Nov",
+                "Dez",
+            ];
+
+            // Preenche os selects de Ano/Mês/Dia de um filtro (prefixo ex.: 'fl','ob','cb','pd','ex')
+            // com o ano/mês/dia atuais pré-selecionados. Só roda uma vez por elemento (dataset.init)
+            // para não sobrescrever a escolha do usuário a cada re-render.
+            function initFiltroRel(prefix) {
+                const now = new Date();
+                const elAno = document.getElementById(prefix + "Ano");
+                const elMes = document.getElementById(prefix + "Mes");
+                const elDia = document.getElementById(prefix + "Dia");
+                if (elAno && !elAno.dataset.init) {
+                    const anosSet = new Set(
+                        db("movimentacao")
                             .map((m) => m.vencimento?.split("-")[0])
                             .filter(Boolean),
-                    ),
-                ];
-                const curAno = new Date().getFullYear();
-                if (!anos.includes(String(curAno))) anos.push(String(curAno));
-                anos.sort().reverse();
-                const sel = document.getElementById("relAno");
-                sel.innerHTML = anos
-                    .map(
-                        (a) =>
-                            `<option ${a == curAno ? "selected" : ""}>${a}</option>`,
-                    )
-                    .join("");
+                    );
+                    anosSet.add(String(now.getFullYear()));
+                    const anos = [...anosSet].sort().reverse();
+                    elAno.innerHTML = anos
+                        .map((a) => `<option value="${a}">${a}</option>`)
+                        .join("");
+                    elAno.value = String(now.getFullYear());
+                    elAno.dataset.init = "1";
+                }
+                if (elMes && !elMes.dataset.init) {
+                    elMes.innerHTML =
+                        '<option value="">Todos</option>' +
+                        MESES_PT.map(
+                            (m, i) => `<option value="${i + 1}">${m}</option>`,
+                        ).join("");
+                    elMes.value = String(now.getMonth() + 1);
+                    elMes.dataset.init = "1";
+                }
+                if (elDia && !elDia.dataset.init) {
+                    let opts = '<option value="">Todos</option>';
+                    for (let d = 1; d <= 31; d++)
+                        opts += `<option value="${d}">${d}</option>`;
+                    elDia.innerHTML = opts;
+                    elDia.value = String(now.getDate());
+                    elDia.dataset.init = "1";
+                }
+            }
+
+            // Resolve o intervalo de datas efetivo de um filtro: se houver um range (De/Até)
+            // preenchido, ele prevalece; caso contrário, deriva o intervalo de Ano+Mês+Dia
+            // (Mês/Dia em branco = "Todos", abrangendo o ano/mês inteiro).
+            function resolveFiltroRel(prefix) {
+                const dtI = document.getElementById(prefix + "DtI")?.value || "";
+                const dtF = document.getElementById(prefix + "DtF")?.value || "";
+                if (dtI || dtF) return { dtI: dtI || null, dtF: dtF || null };
+                const now = new Date();
+                const ano =
+                    document.getElementById(prefix + "Ano")?.value ||
+                    String(now.getFullYear());
+                const mes = document.getElementById(prefix + "Mes")?.value || "";
+                const dia = document.getElementById(prefix + "Dia")?.value || "";
+                if (!mes) return { dtI: `${ano}-01-01`, dtF: `${ano}-12-31` };
+                const mm = String(mes).padStart(2, "0");
+                if (!dia) {
+                    const ultimoDia = new Date(
+                        Number(ano),
+                        Number(mes),
+                        0,
+                    ).getDate();
+                    return {
+                        dtI: `${ano}-${mm}-01`,
+                        dtF: `${ano}-${mm}-${String(ultimoDia).padStart(2, "0")}`,
+                    };
+                }
+                const dd = String(dia).padStart(2, "0");
+                return { dtI: `${ano}-${mm}-${dd}`, dtF: `${ano}-${mm}-${dd}` };
+            }
+
+            // Limpa o range De/Até e volta Ano/Mês/Dia para o dia atual, depois reconstrói o relatório.
+            function limparFiltroRel(prefix, fn) {
+                const now = new Date();
+                const elDtI = document.getElementById(prefix + "DtI");
+                const elDtF = document.getElementById(prefix + "DtF");
+                if (elDtI) elDtI.value = "";
+                if (elDtF) elDtF.value = "";
+                const elAno = document.getElementById(prefix + "Ano");
+                const elMes = document.getElementById(prefix + "Mes");
+                const elDia = document.getElementById(prefix + "Dia");
+                if (elAno) elAno.value = String(now.getFullYear());
+                if (elMes) elMes.value = String(now.getMonth() + 1);
+                if (elDia) elDia.value = String(now.getDate());
+                fn();
+            }
+
+            function renderRel() {
+                ["fl", "ob", "cb", "pd", "ex"].forEach(initFiltroRel);
                 const eo = document.getElementById("exObra");
                 if (eo) {
                     const fst = eo.options[0];
@@ -3150,24 +3479,14 @@
             }
 
             function buildFluxo() {
-                const ano =
-                    document.getElementById("relAno")?.value ||
-                    new Date().getFullYear();
-                const movs = db("movimentacao");
-                const meses = [
-                    "Jan",
-                    "Fev",
-                    "Mar",
-                    "Abr",
-                    "Mai",
-                    "Jun",
-                    "Jul",
-                    "Ago",
-                    "Set",
-                    "Out",
-                    "Nov",
-                    "Dez",
-                ];
+                const { dtI, dtF } = resolveFiltroRel("fl");
+                const ano = document.getElementById("flAno")?.value || dtI?.split("-")[0];
+                const movs = db("movimentacao").filter(
+                    (m) =>
+                        (!dtI || m.vencimento >= dtI) &&
+                        (!dtF || m.vencimento <= dtF),
+                );
+                const meses = MESES_PT;
                 const recM = meses.map((_, i) =>
                     movs
                         .filter(
@@ -3251,8 +3570,13 @@
             }
 
             function buildObraChart() {
-                const movs = db("movimentacao"),
-                    obras = db("obras");
+                const { dtI, dtF } = resolveFiltroRel("ob");
+                const movs = db("movimentacao").filter(
+                    (m) =>
+                        (!dtI || m.vencimento >= dtI) &&
+                        (!dtF || m.vencimento <= dtF),
+                );
+                const obras = db("obras");
                 const data = obras.map((o) => ({
                     nome: o.nome,
                     orc: Number(o.orcamento || 0),
@@ -3344,8 +3668,109 @@
                     : "";
             }
 
+            function buildColabChart() {
+                const { dtI, dtF } = resolveFiltroRel("cb");
+                const movs = db("movimentacao").filter(
+                    (m) =>
+                        m.colabId &&
+                        (!dtI || m.vencimento >= dtI) &&
+                        (!dtF || m.vencimento <= dtF),
+                );
+                const horas = db("horas").filter(
+                    (h) =>
+                        (!dtI || h.data >= dtI) && (!dtF || h.data <= dtF),
+                );
+                const cols = db("colaboradores");
+                const data = cols
+                    .map((c) => ({
+                        nome: c.nome,
+                        custo: movs
+                            .filter(
+                                (m) =>
+                                    m.colabId === c.id &&
+                                    m.tipo === "Despesa",
+                            )
+                            .reduce((a, m) => a + Number(m.valor || 0), 0),
+                        dias: horas.filter((h) => h.colabId === c.id).length,
+                    }))
+                    .filter((d) => d.custo > 0 || d.dias > 0)
+                    .sort((a, b) => b.custo - a.custo);
+                if (chColab) {
+                    chColab.destroy();
+                    chColab = null;
+                }
+                const ctx = document.getElementById("chColab");
+                if (ctx && data.length) {
+                    chColab = new Chart(ctx, {
+                        type: "bar",
+                        data: {
+                            labels: data.map((d) => d.nome),
+                            datasets: [
+                                {
+                                    label: "Custo (R$)",
+                                    data: data.map((d) => d.custo),
+                                    backgroundColor: "rgba(239,68,68,.7)",
+                                    borderRadius: 4,
+                                },
+                                {
+                                    label: "Dias Trabalhados",
+                                    data: data.map((d) => d.dias),
+                                    type: "line",
+                                    yAxisID: "y1",
+                                    borderColor: "#3b82f6",
+                                    backgroundColor: "rgba(59,130,246,.08)",
+                                    tension: 0.4,
+                                    fill: true,
+                                    pointRadius: 3,
+                                },
+                            ],
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { position: "top" } },
+                            scales: {
+                                y: {
+                                    ticks: {
+                                        callback: (v) =>
+                                            "R$" + v.toLocaleString("pt-BR"),
+                                    },
+                                },
+                                y1: {
+                                    position: "right",
+                                    grid: { drawOnChartArea: false },
+                                    ticks: { precision: 0 },
+                                },
+                            },
+                        },
+                    });
+                } else if (ctx)
+                    ctx.parentElement.innerHTML =
+                        '<div class="ctitle">👷 Custo e Dias Trabalhados por Colaborador</div><div class="empty"><div class="ei">👷</div><p>Sem lançamentos de colaboradores no período</p></div>';
+                document.getElementById("colabRelTable").innerHTML = data
+                    .length
+                    ? `<div class="card" style="margin-top:16px;">
+    <div class="card-title">Detalhe por Colaborador</div>
+    <table><thead><tr><th>Colaborador</th><th>Dias Trabalhados</th><th>Custo Total</th></tr></thead>
+    <tbody>${data
+        .map(
+            (d) => `<tr><td><strong>${d.nome}</strong></td>
+      <td>${d.dias}</td>
+      <td style="color:var(--err);font-weight:600">${fmtBRL(d.custo)}</td>
+    </tr>`,
+        )
+        .join("")}</tbody>
+    <tfoot><tr style="font-weight:700;background:#f8fafc;"><td>TOTAL</td><td>${data.reduce((a, d) => a + d.dias, 0)}</td><td style="color:var(--err)">${fmtBRL(data.reduce((a, d) => a + d.custo, 0))}</td></tr></tfoot>
+    </table></div>`
+                    : "";
+            }
+
             function buildPend() {
-                const movs = db("movimentacao");
+                const { dtI, dtF } = resolveFiltroRel("pd");
+                const movs = db("movimentacao").filter(
+                    (m) =>
+                        (!dtI || m.vencimento >= dtI) &&
+                        (!dtF || m.vencimento <= dtF),
+                );
                 const pend = movs
                     .filter((m) =>
                         ["Pendente", "Não Recebido"].includes(m.pago),
@@ -3382,8 +3807,7 @@
             }
 
             function buildExtrato() {
-                const dtI = document.getElementById("exDtI").value,
-                    dtF = document.getElementById("exDtF").value;
+                const { dtI, dtF } = resolveFiltroRel("ex");
                 const tipo = document.getElementById("exTipo").value,
                     obra = document.getElementById("exObra").value;
                 let d = db("movimentacao");
