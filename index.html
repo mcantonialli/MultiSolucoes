@@ -2227,6 +2227,21 @@
                     })
                 );
             }
+            // Converte texto de valor monetário em número, aceitando tanto o formato
+            // brasileiro (ponto = milhar, vírgula = decimal, ex: "1.234,56") quanto o
+            // formato simples com ponto decimal (ex: "1234.56").
+            function parseValorBR(str) {
+                if (str == null) return NaN;
+                let s = String(str).trim();
+                if (!s) return NaN;
+                if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
+                return parseFloat(s);
+            }
+            // Formata um número para exibir num campo de texto editável no padrão BR (vírgula decimal).
+            function numToInputBR(n) {
+                if (n === null || n === undefined || n === "") return "";
+                return String(n).replace(".", ",");
+            }
             function fmtDate(s) {
                 if (!s) return "—";
                 const [y, m, d] = s.split("-");
@@ -2985,7 +3000,7 @@
                 const tipo = document.getElementById("mTipo").value;
                 const venc = document.getElementById("mVenc").value;
                 const catId = document.getElementById("mCat").value;
-                const valor = parseFloat(
+                const valor = parseValorBR(
                     document.getElementById("mValor").value,
                 );
                 const desc = document.getElementById("mDesc").value.trim();
@@ -4264,7 +4279,7 @@
       </select></div>
       <div class="fgrp"><label>Vencimento *</label><input type="date" id="mVenc" value="${v("vencimento", today())}"></div>
       <div class="fgrp"><label>Categoria *</label><select id="mCat">${catsOpts(tipoV)}</select></div>
-      <div class="fgrp"><label>Valor (R$) *</label><input type="number" id="mValor" value="${v("valor", "")}" min="0" step="0.01"></div>
+      <div class="fgrp"><label>Valor (R$) *</label><input type="text" inputmode="decimal" id="mValor" value="${numToInputBR(v("valor", ""))}" placeholder="0,00"></div>
       <div class="fgrp"><label>Obra</label><select id="mObra"><option value="">— nenhuma —</option>${obras.map((o) => `<option value="${o.id}" ${v("obraId") === o.id ? "selected" : ""}>${o.nome}</option>`).join("")}</select></div>
       <div class="fgrp"><label>Colaborador</label><select id="mColab"><option value="">— nenhum —</option>${cols.map((c) => `<option value="${c.id}" ${v("colabId") === c.id ? "selected" : ""}>${c.nome}</option>`).join("")}</select></div>
       <div class="fgrp full"><label>Descrição *</label><input type="text" id="mDesc" value="${v("descricao", "")}" placeholder="Descreva a movimentação..."></div>
@@ -4289,7 +4304,7 @@
       <div class="fgrp full"><label>Nome da Obra *</label><input type="text" id="oNome" value="${v("nome", "")}"></div>
       <div class="fgrp"><label>Responsável</label><input type="text" id="oCont" value="${v("contato", "")}"></div>
       <div class="fgrp"><label>Celular</label><input type="text" id="oCel" value="${v("cel", "")}"></div>
-      <div class="fgrp"><label>Orçamento Previsto (R$)</label><input type="number" id="oOrc" value="${v("orcamento", "")}" min="0" step="0.01" placeholder="0,00"></div>
+      <div class="fgrp"><label>Orçamento Previsto (R$)</label><input type="text" inputmode="decimal" id="oOrc" value="${numToInputBR(v("orcamento", ""))}" placeholder="0,00"></div>
       <div class="fgrp"><label>&nbsp;</label></div>
       <div class="fgrp full"><label>Descrição</label><textarea id="oDesc">${v("descricao", "")}</textarea></div>
     </div>`;
@@ -4337,7 +4352,7 @@
       <div class="fgrp"><label>Colaborador *</label><select id="hColab"><option value="">Selecione...</option>${cols.map((c) => `<option value="${c.id}" ${v("colabId") === c.id ? "selected" : ""}>${c.nome}</option>`).join("")}</select></div>
       <div class="fgrp"><label>Obra *</label><select id="hObra"><option value="">Selecione...</option>${obras.map((o) => `<option value="${o.id}" ${v("obraId") === o.id ? "selected" : ""}>${o.nome}</option>`).join("")}</select></div>
       <div class="fgrp"><label>Data *</label><input type="date" id="hData" value="${v("data", today())}"></div>
-      <div class="fgrp"><label>Valor da Diária (R$) *</label><input type="number" id="hDiaria" value="${v("diaria", "")}" min="0" step="0.01" placeholder="Ex: 200,00"></div>
+      <div class="fgrp"><label>Valor da Diária (R$) *</label><input type="text" inputmode="decimal" id="hDiaria" value="${numToInputBR(v("diaria", ""))}" placeholder="Ex: 200,00"></div>
       <div class="fgrp"><label>Status de Pagamento</label><select id="hStatusPag">${statusOpts}</select></div>
       <div class="fgrp"><label>Forma de Pagamento</label><select id="hFP"><option value="">—</option>${fps.map((f) => `<option ${v("formaPagamento") === f ? "selected" : ""}>${f}</option>`).join("")}</select></div>
       <div class="fgrp full"><label>Descrição / Serviço</label><textarea id="hDesc">${v("descricao", "")}</textarea></div>
@@ -4398,7 +4413,7 @@
                     contato: document.getElementById("oCont").value || null,
                     cel: document.getElementById("oCel").value || null,
                     orcamento:
-                        parseFloat(document.getElementById("oOrc").value) ||
+                        parseValorBR(document.getElementById("oOrc").value) ||
                         null,
                     descricao: document.getElementById("oDesc").value || null,
                 };
@@ -4464,7 +4479,7 @@
                 const colabId = document.getElementById("hColab").value;
                 const obraId = document.getElementById("hObra").value;
                 const data2 = document.getElementById("hData").value;
-                const diaria = parseFloat(
+                const diaria = parseValorBR(
                     document.getElementById("hDiaria").value,
                 );
                 const statusPag = document.getElementById("hStatusPag").value;
@@ -4608,7 +4623,7 @@
                     dbAll("colaboradores").map((c) => [c.id, c.nome]),
                 );
                 const movRows = dbAll("movimentacao").map((m) => ({
-                    Status: m._status || "C",
+                    "Status Auditoria": m._status || "C",
                     "Data/Hora": m._auditAt || "",
                     Usuário: m._auditUser || "",
                     ID: m.id,
@@ -4634,7 +4649,7 @@
                     "Movimentações",
                 );
                 const obraRows = dbAll("obras").map((o) => ({
-                    Status: o._status || "C",
+                    "Status Auditoria": o._status || "C",
                     "Data/Hora": o._auditAt || "",
                     Usuário: o._auditUser || "",
                     ID: o.id,
@@ -4643,7 +4658,6 @@
                     Contato: o.contato || "",
                     Telefone: o.cel || "",
                     Orçamento: Number(o.orcamento || 0),
-                    Status: o.status || "",
                 }));
                 XLSX.utils.book_append_sheet(
                     wb,
