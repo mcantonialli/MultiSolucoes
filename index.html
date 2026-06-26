@@ -67,6 +67,23 @@
                 color: var(--b2);
                 margin-bottom: 4px;
             }
+            .brand-row {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+            .login-box .brand-row {
+                margin-bottom: 4px;
+            }
+            .brand-row .logo-img {
+                object-fit: contain;
+                flex-shrink: 0;
+            }
+            .login-box .logo-img {
+                width: 52px;
+                height: 52px;
+            }
             .login-box p {
                 color: var(--mu);
                 font-size: 0.85rem;
@@ -130,6 +147,13 @@
                 color: rgba(255, 255, 255, 0.4);
                 font-size: 0.68rem;
                 margin-top: 2px;
+            }
+            .sb-logo .brand-row {
+                justify-content: flex-start;
+            }
+            .sb-logo .logo-img {
+                width: 38px;
+                height: 38px;
             }
             .sb-nav {
                 flex: 1;
@@ -873,8 +897,14 @@
         <!-- LOGIN -->
         <div id="loginWrap" class="show">
             <div class="login-box">
-                <div style="font-size: 2.5rem; margin-bottom: 8px">🏗️</div>
-                <h1>Gestão Multi</h1>
+                <div class="brand-row">
+                    <img
+                        class="logo-img"
+                        src="Logo MULTISOLUÇOES.png"
+                        alt="MultiSoluções"
+                    />
+                    <h1>MultiSoluções</h1>
+                </div>
                 <p>Obras · Finanças · Equipes</p>
                 <div class="fgrp">
                     <label>Usuário</label
@@ -913,7 +943,14 @@
             <!-- SIDEBAR -->
             <aside id="sb">
                 <div class="sb-logo">
-                    <h1>🏗️ Gestão MultiSoluções</h1>
+                    <div class="brand-row">
+                        <img
+                            class="logo-img"
+                            src="Logo MULTISOLUÇOES.png"
+                            alt="MultiSoluções"
+                        />
+                        <h1>MultiSoluções</h1>
+                    </div>
                     <p>Obras · Finanças · Equipes</p>
                 </div>
                 <nav class="sb-nav">
