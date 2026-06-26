@@ -934,7 +934,7 @@
                         margin-top: 12px;
                     "
                 >
-                    Padrão: admin / 1234
+                    Padrão: admin / multi@solucoes
                 </p>
             </div>
         </div>
@@ -1039,7 +1039,7 @@
                         class="sb-item"
                         data-page="cfg"
                         onclick="nav('cfg')"
-                        data-perm="admin"
+                        data-perm="admin,financeiro,obra"
                     >
                         <span class="ic">⚙️</span> Configurações
                     </div>
@@ -1501,27 +1501,65 @@
                     <div class="tabs">
                         <button
                             class="tab active"
+                            onclick="showCfgTab('cfgSenha', this)"
+                        >
+                            🔑 Minha Senha
+                        </button>
+                        <button
+                            class="tab admin-only"
                             onclick="showCfgTab('cfgPR', this)"
                         >
                             🏷️ Status Pagamento
                         </button>
-                        <button class="tab" onclick="showCfgTab('cfgFP', this)">
+                        <button
+                            class="tab admin-only"
+                            onclick="showCfgTab('cfgFP', this)"
+                        >
                             💳 Formas de Pag.
                         </button>
                         <button
-                            class="tab"
+                            class="tab admin-only"
                             onclick="showCfgTab('cfgUsers', this)"
                         >
                             👤 Usuários
                         </button>
                         <button
-                            class="tab"
+                            class="tab admin-only"
                             onclick="showCfgTab('cfgDados', this)"
                         >
                             💾 Dados
                         </button>
                     </div>
-                    <div id="cfgPR" style="display: block">
+                    <div id="cfgSenha" style="display: block">
+                        <div class="card" style="max-width: 420px">
+                            <div class="card-title">
+                                🔑 Alterar Minha Senha
+                            </div>
+                            <div class="fgrid" style="grid-template-columns: 1fr">
+                                <div class="fgrp">
+                                    <label>Senha Atual</label
+                                    ><input type="password" id="msAtual" autocomplete="current-password" />
+                                </div>
+                                <div class="fgrp">
+                                    <label>Nova Senha</label
+                                    ><input type="password" id="msNova" autocomplete="new-password" />
+                                </div>
+                                <div class="fgrp">
+                                    <label>Confirmar Nova Senha</label
+                                    ><input type="password" id="msConfirma" autocomplete="new-password" onkeydown="if (event.key === 'Enter') trocarMinhaSenha();" />
+                                </div>
+                                <div class="fgrp">
+                                    <button
+                                        class="btn btn-ac btn-sm"
+                                        onclick="trocarMinhaSenha()"
+                                    >
+                                        💾 Salvar Nova Senha
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="cfgPR" style="display: none">
                         <div class="card">
                             <div class="card-title">Status de Pagamento</div>
                             <div id="listPR"></div>
@@ -1953,7 +1991,7 @@
                         id: "u1",
                         nome: "Administrador",
                         usuario: "admin",
-                        senha: "1234",
+                        senha: "multi@solucoes",
                         perfil: "admin",
                     },
                 ],
@@ -2093,9 +2131,33 @@
                 if (changed)
                     localStorage.setItem("gm_usuarios", JSON.stringify(users));
             }
+            // Atualiza usuários "admin" que ainda estejam na senha padrão antiga (1234)
+            // para a nova senha padrão (multi@solucoes). Não altera quem já trocou a senha.
+            async function resetSenhaPadraoAdmin() {
+                const SENHA_PADRAO_ANTIGA = "1234";
+                const SENHA_PADRAO_NOVA = "multi@solucoes";
+                const users = dbAll("usuarios");
+                let changed = false;
+                for (const u of users) {
+                    if (
+                        u.usuario === "admin" &&
+                        u.senhaHash &&
+                        (await checkPass(u, SENHA_PADRAO_ANTIGA))
+                    ) {
+                        const { salt, senhaHash } =
+                            await makeCred(SENHA_PADRAO_NOVA);
+                        u.salt = salt;
+                        u.senhaHash = senhaHash;
+                        changed = true;
+                    }
+                }
+                if (changed)
+                    localStorage.setItem("gm_usuarios", JSON.stringify(users));
+            }
 
             async function doLogin() {
                 await migrarSenhas();
+                await resetSenhaPadraoAdmin();
                 const u = document.getElementById("lgUser").value.trim();
                 const p = document.getElementById("lgPass").value;
                 const users = db("usuarios");
@@ -2284,10 +2346,12 @@
             }
 
             function showCfgTab(id, btn) {
-                ["cfgPR", "cfgFP", "cfgUsers"].forEach((t) => {
-                    const el = document.getElementById(t);
-                    if (el) el.style.display = "none";
-                });
+                ["cfgSenha", "cfgPR", "cfgFP", "cfgUsers", "cfgDados"].forEach(
+                    (t) => {
+                        const el = document.getElementById(t);
+                        if (el) el.style.display = "none";
+                    },
+                );
                 document
                     .querySelectorAll("#pg-cfg .tab")
                     .forEach((b) => b.classList.remove("active"));
@@ -3633,6 +3697,22 @@
 
             // ── CONFIG ────────────────────────────────────────────────────
             function renderCfg() {
+                const isAdmin = currentUser?.perfil === "admin";
+                document
+                    .querySelectorAll("#pg-cfg .tab.admin-only")
+                    .forEach((b) => (b.style.display = isAdmin ? "" : "none"));
+                if (!isAdmin) {
+                    const activeTab = document.querySelector(
+                        "#pg-cfg .tab.active",
+                    );
+                    if (activeTab && activeTab.classList.contains("admin-only")) {
+                        showCfgTab(
+                            "cfgSenha",
+                            document.querySelector("#pg-cfg .tab"),
+                        );
+                        return;
+                    }
+                }
                 const prs = db("pagoRecebido");
                 document.getElementById("listPR").innerHTML = prs
                     .map(
@@ -3748,6 +3828,37 @@
                 dbDel("usuarios", id);
                 renderCfg();
                 toast("Usuário removido", "ok");
+            }
+            async function trocarMinhaSenha() {
+                if (!currentUser) return;
+                const atual = document.getElementById("msAtual").value;
+                const nova = document.getElementById("msNova").value;
+                const confirma = document.getElementById("msConfirma").value;
+                if (!atual || !nova || !confirma) {
+                    toast("Preencha todos os campos", "err");
+                    return;
+                }
+                if (nova.length < 4) {
+                    toast("A nova senha deve ter ao menos 4 caracteres", "err");
+                    return;
+                }
+                if (nova !== confirma) {
+                    toast("As senhas não coincidem", "err");
+                    return;
+                }
+                const userAtual = dbFind("usuarios", currentUser.id);
+                if (!userAtual || !(await checkPass(userAtual, atual))) {
+                    toast("Senha atual incorreta", "err");
+                    return;
+                }
+                const { salt, senhaHash } = await makeCred(nova);
+                dbUpd("usuarios", currentUser.id, { salt, senhaHash });
+                currentUser = { ...userAtual, salt, senhaHash };
+                sessionStorage.setItem("gmUser", JSON.stringify(currentUser));
+                ["msAtual", "msNova", "msConfirma"].forEach(
+                    (id) => (document.getElementById(id).value = ""),
+                );
+                toast("Senha alterada com sucesso!", "ok");
             }
 
             // ── MODAL / CRUD ─────────────────────────────────────────────
