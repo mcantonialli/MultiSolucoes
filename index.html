@@ -42,80 +42,15 @@
                 flex: 1;
                 width: 100%;
             }
-            #loginWrap {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: linear-gradient(135deg, var(--b1), var(--b3));
-                z-index: 9999;
-                align-items: center;
-                justify-content: center;
-            }
-            #loginWrap.show {
-                display: flex;
-            }
-            .login-box {
-                background: #fff;
-                border-radius: 18px;
-                padding: 40px;
-                width: 360px;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-                text-align: center;
-            }
-            .login-box h1 {
-                font-size: 1.5rem;
-                color: var(--b2);
-                margin-bottom: 4px;
-            }
             .brand-row {
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 gap: 10px;
             }
-            .login-box .brand-row {
-                margin-bottom: 4px;
-            }
             .brand-row .logo-img {
                 object-fit: contain;
                 flex-shrink: 0;
-            }
-            .login-box .logo-img {
-                width: 52px;
-                height: 52px;
-            }
-            .login-box p {
-                color: var(--mu);
-                font-size: 0.85rem;
-                margin-bottom: 24px;
-            }
-            .login-box .fgrp {
-                margin-bottom: 14px;
-                text-align: left;
-            }
-            .login-box .fgrp label {
-                font-size: 0.78rem;
-                font-weight: 600;
-                color: var(--b2);
-                display: block;
-                margin-bottom: 4px;
-            }
-            .login-box .fgrp input {
-                width: 100%;
-                padding: 10px 12px;
-                border: 1.5px solid var(--br);
-                border-radius: 8px;
-                font-size: 0.9rem;
-            }
-            .login-box .fgrp input:focus {
-                outline: none;
-                border-color: var(--b3);
-            }
-            .login-err {
-                color: var(--err);
-                font-size: 0.8rem;
-                margin-bottom: 10px;
-                display: none;
             }
             #sb {
                 width: var(--sbw);
@@ -214,21 +149,6 @@
             }
             .sb-user strong {
                 display: block;
-                color: #fff;
-            }
-            .btn-logout {
-                width: 100%;
-                padding: 7px;
-                background: rgba(255, 255, 255, 0.1);
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                color: rgba(255, 255, 255, 0.7);
-                border-radius: 7px;
-                cursor: pointer;
-                font-size: 0.75rem;
-                transition: all 0.15s;
-            }
-            .btn-logout:hover {
-                background: rgba(255, 255, 255, 0.2);
                 color: #fff;
             }
             #main {
@@ -894,51 +814,6 @@
         </style>
     </head>
     <body>
-        <!-- LOGIN -->
-        <div id="loginWrap" class="show">
-            <div class="login-box">
-                <div class="brand-row">
-                    <img
-                        class="logo-img"
-                        src="Logo MULTISOLUÇOES.png"
-                        alt="MultiSoluções"
-                    />
-                    <h1>MultiSoluções</h1>
-                </div>
-                <p>Obras · Finanças · Equipes</p>
-                <div class="fgrp">
-                    <label>Usuário</label
-                    ><input type="text" id="lgUser" autocomplete="username" />
-                </div>
-                <div class="fgrp">
-                    <label>Senha</label
-                    ><input
-                        type="password"
-                        id="lgPass"
-                        autocomplete="current-password"
-                        onkeydown="if (event.key === 'Enter') doLogin();"
-                    />
-                </div>
-                <p class="login-err" id="lgErr">Usuário ou senha incorretos.</p>
-                <button
-                    class="btn btn-ok"
-                    style="width: 100%; justify-content: center; padding: 11px"
-                    onclick="doLogin()"
-                >
-                    Entrar
-                </button>
-                <p
-                    style="
-                        font-size: 0.7rem;
-                        color: var(--mu);
-                        margin-top: 12px;
-                    "
-                >
-                    Padrão: admin / multi@solucoes
-                </p>
-            </div>
-        </div>
-
         <div id="app">
             <!-- SIDEBAR -->
             <aside id="sb">
@@ -1058,9 +933,6 @@
                         <strong id="sbUserName">Administrador</strong
                         ><span id="sbUserPerfil">admin</span>
                     </div>
-                    <button class="btn-logout" onclick="doLogout()">
-                        🚪 Sair
-                    </button>
                 </div>
             </aside>
 
@@ -2328,37 +2200,18 @@
                     localStorage.setItem("gm_usuarios", JSON.stringify(users));
             }
 
-            async function doLogin() {
+            async function autoLogin() {
                 await migrarSenhas();
                 await resetSenhaPadraoAdmin();
-                const u = document.getElementById("lgUser").value.trim();
-                const p = document.getElementById("lgPass").value;
-                const users = db("usuarios");
-                const candidate = users.find((x) => x.usuario === u);
-                const found =
-                    candidate && (await checkPass(candidate, p))
-                        ? candidate
-                        : null;
-                if (!found) {
-                    document.getElementById("lgErr").style.display = "block";
-                    return;
+                const admin = db("usuarios").find((x) => x.usuario === "admin");
+                if (admin) {
+                    currentUser = admin;
+                    document.getElementById("sbUserName").textContent = admin.nome;
+                    document.getElementById("sbUserPerfil").textContent = admin.perfil;
+                    applyPermissions();
+                    checkAlertas();
+                    nav("dashboard");
                 }
-                document.getElementById("lgErr").style.display = "none";
-                currentUser = found;
-                sessionStorage.setItem("gmUser", JSON.stringify(found));
-                document.getElementById("loginWrap").classList.remove("show");
-                document.getElementById("sbUserName").textContent = found.nome;
-                document.getElementById("sbUserPerfil").textContent =
-                    found.perfil;
-                applyPermissions();
-                checkAlertas();
-                nav("dashboard");
-            }
-
-            function doLogout() {
-                currentUser = null;
-                sessionStorage.removeItem("gmUser");
-                document.getElementById("loginWrap").classList.add("show");
             }
 
             function applyPermissions() {
@@ -4999,92 +4852,20 @@
             if (typeof window.showSaveFilePicker !== "undefined") {
                 autoLoad().then((loaded) => {
                     if (loaded) {
-                        // Reativar UI pós-login se sessão existir
-                        const s2 = sessionStorage.getItem("gmUser");
-                        if (s2) {
-                            try {
-                                const u = JSON.parse(s2);
-                                const f = db("usuarios").find(
-                                    (x) => x.id === u.id,
-                                );
-                                if (f) {
-                                    currentUser = f;
-                                    document
-                                        .getElementById("loginWrap")
-                                        .classList.remove("show");
-                                    document.getElementById(
-                                        "sbUserName",
-                                    ).textContent = f.nome;
-                                    document.getElementById(
-                                        "sbUserPerfil",
-                                    ).textContent = f.perfil;
-                                    applyPermissions();
-                                    checkAlertas();
-                                    nav("dashboard");
-                                }
-                            } catch (e) {}
-                        }
                         // Atualizar UI do painel cfgDados
                         const fa = document.getElementById("fileActiveArea");
                         const fp = document.getElementById("filePickerArea");
                         if (fa && fp && _fileHandle) {
                             fa.style.display = "block";
                             fp.style.display = "none";
-                            const fn =
-                                document.getElementById("fileActiveName");
+                            const fn = document.getElementById("fileActiveName");
                             if (fn) fn.textContent = _fileHandle.name;
                         }
-                        return;
                     }
-                    // Fallback: usar sessão normal
-                    const sess = sessionStorage.getItem("gmUser");
-                    if (sess) {
-                        try {
-                            const u = JSON.parse(sess);
-                            const found = db("usuarios").find(
-                                (x) => x.id === u.id,
-                            );
-                            if (found) {
-                                currentUser = found;
-                                document
-                                    .getElementById("loginWrap")
-                                    .classList.remove("show");
-                                document.getElementById(
-                                    "sbUserName",
-                                ).textContent = found.nome;
-                                document.getElementById(
-                                    "sbUserPerfil",
-                                ).textContent = found.perfil;
-                                applyPermissions();
-                                checkAlertas();
-                                nav("dashboard");
-                            }
-                        } catch (e) {}
-                    }
+                    autoLogin();
                 });
             } else {
-                // Navegador sem suporte a File System Access API — usar sessão normal
-                const sess = sessionStorage.getItem("gmUser");
-                if (sess) {
-                    try {
-                        const u = JSON.parse(sess);
-                        const found = db("usuarios").find((x) => x.id === u.id);
-                        if (found) {
-                            currentUser = found;
-                            document
-                                .getElementById("loginWrap")
-                                .classList.remove("show");
-                            document.getElementById("sbUserName").textContent =
-                                found.nome;
-                            document.getElementById(
-                                "sbUserPerfil",
-                            ).textContent = found.perfil;
-                            applyPermissions();
-                            checkAlertas();
-                            nav("dashboard");
-                        }
-                    } catch (e) {}
-                }
+                autoLogin();
             }
         </script>
     </body>
